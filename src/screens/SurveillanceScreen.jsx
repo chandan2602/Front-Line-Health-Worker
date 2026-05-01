@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { getData, appendData } from '../utils/storage';
+import PatientSearchBar from '../components/PatientSearchBar';
 
 function BackIcon() {
   return (
@@ -109,6 +110,7 @@ function SurveillanceScreen({ onBack }) {
         {/* SICK PERSON TAB */}
         {activeTab === 'sick' && (
           <form onSubmit={handleSaveSick}>
+            <PatientSearchBar onPatientFound={p => setSickForm(f => ({ ...f, name: p.name, age: String(p.age), gender: p.gender, village: p.village }))} />
             <div className="card" style={{ marginBottom: 14 }}>
               <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Patient Details</p>
               <div className="form-group">

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import AppBar from '../components/AppBar';
 import FormField from '../components/FormField';
 import BottomNav from '../components/BottomNav';
+import PatientSearchBar from '../components/PatientSearchBar';
 import { appendData } from '../utils/storage';
 
 function ToggleSwitch({ checked, onChange, label }) {
@@ -77,6 +78,7 @@ function NCDScreen({ onNavigate, onBack }) {
       <AppBar title="NCD Screening" onBack={onBack} />
 
       <div className="screen-content">
+        <PatientSearchBar onPatientFound={p => update('name', p.name) || setForm(f => ({ ...f, name: p.name, age: String(p.age), gender: p.gender }))} />
         {/* CBAC Tabs */}
         <div className="tabs">
           {['A', 'B', 'C'].map(tab => (

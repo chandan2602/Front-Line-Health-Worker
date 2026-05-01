@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { getData, appendData } from '../utils/storage';
+import PatientSearchBar from '../components/PatientSearchBar';
 
 function BackIcon() {
   return (
@@ -71,6 +72,10 @@ function DeliveryScreen({ onBack }) {
           </div>
         )}
 
+        <PatientSearchBar onPatientFound={p => {
+          const match = pregnantWomen.find(pw => pw.name === p.name || pw.mobile === p.mobile);
+          if (match) setSelectedPW(String(match.id));
+        }} />
         <form onSubmit={handleSave}>
           {/* Select Patient */}
           <div className="card" style={{ marginBottom: 14 }}>

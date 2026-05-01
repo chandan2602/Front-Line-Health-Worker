@@ -1,6 +1,126 @@
 import React from 'react';
 import { getData } from '../utils/storage';
+
 import { useLanguage } from '../contexts/LanguageContext';
+
+const menuSections = [
+  {
+    label: 'MAIN',
+    items: [
+      { icon: '🏠', label: 'Home Dashboard', screen: 'dashboard' },
+      { icon: '🏘', label: 'Household Enumeration', screen: 'household' },
+    ]
+  },
+  {
+    label: 'MATERNAL HEALTH',
+    items: [
+      { icon: '👫', label: 'EC Registration', screen: 'ec' },
+      { icon: '🤰', label: 'Pregnant Woman Reg.', screen: 'pregnant' },
+      { icon: '❤️', label: 'ANC Services', screen: 'anc' },
+      { icon: '🏥', label: 'Delivery Tracking', screen: 'delivery' },
+      { icon: '🏠', label: 'HBPNC', screen: 'hbpnc' },
+    ]
+  },
+  {
+    label: 'CHILD HEALTH',
+    items: [
+      { icon: '👶', label: 'Child Registration', screen: 'child' },
+      { icon: '💉', label: 'Vaccination Due List', screen: 'vaccination' },
+      { icon: '🍼', label: 'HBNC', screen: 'hbnc' },
+      { icon: '🌱', label: 'HBYC', screen: 'hbyc' },
+      { icon: '📊', label: 'HBNC/HBYC Report', screen: 'hbncreport' },
+    ]
+  },
+  {
+    label: 'FAMILY PLANNING',
+    items: [
+      { icon: '💬', label: 'FP Counseling', screen: 'fpcounseling' },
+      { icon: '🏥', label: 'FP Services', screen: 'fpservices' },
+    ]
+  },
+  {
+    label: 'ADOLESCENT HEALTH',
+    items: [
+      { icon: '🧑', label: 'Adolescent Registration', screen: 'adolescent' },
+      { icon: '🔍', label: 'Adolescent Screening', screen: 'adolescentscreen' },
+    ]
+  },
+  {
+    label: 'MCH SERVICES',
+    items: [
+      { icon: '📋', label: 'VHSND Sessions', screen: 'vhsnd' },
+    ]
+  },
+  {
+    label: 'COMMUNICABLE DISEASES',
+    items: [
+      { icon: '🫁', label: 'TB Screening', screen: 'tbscreening' },
+      { icon: '⚙️', label: 'TB Management', screen: 'tb' },
+      { icon: '🤒', label: 'Sick Person Report', screen: 'surveillance' },
+      { icon: '🎯', label: 'Surveillance', screen: 'surveillance' },
+    ]
+  },
+  {
+    label: 'NCDs',
+    items: [
+      { icon: '📋', label: 'CBAC Risk Assessment', screen: 'cbac' },
+      { icon: '💓', label: 'Hypertension Screening', screen: 'hypertension' },
+      { icon: '🩸', label: 'Diabetes Screening', screen: 'diabetes' },
+      { icon: '👄', label: 'Oral Screening', screen: 'oralscreening' },
+      { icon: '🎗️', label: 'Breast/Cervical Screening', screen: 'breastcervical' },
+      { icon: '🛡️', label: 'NCD Screening (CBAC)', screen: 'ncd' },
+    ]
+  },
+  {
+    label: 'GERIATRIC CARE',
+    items: [
+      { icon: '👴', label: 'Geriatric Registration', screen: 'geriatricreg' },
+      { icon: '🔬', label: 'Geriatric Screening', screen: 'geriatricscreen' },
+    ]
+  },
+  {
+    label: 'PALLIATIVE CARE',
+    items: [
+      { icon: '🕊️', label: 'Palliative Registration', screen: 'palliativereg' },
+      { icon: '📝', label: 'Palliative Care Plan', screen: 'palliativeplan' },
+    ]
+  },
+  {
+    label: 'MENTAL HEALTH',
+    items: [
+      { icon: '🧠', label: 'Mental Health Screening', screen: 'mentalhealth' },
+      { icon: '💭', label: 'Counseling Session', screen: 'counseling' },
+    ]
+  },
+  {
+    label: 'ORAL HEALTH',
+    items: [
+      { icon: '🦷', label: 'Oral Health Education', screen: 'oraleducation' },
+    ]
+  },
+  {
+    label: 'ENT CARE',
+    items: [
+      { icon: '👂', label: 'ENT Screening', screen: 'ent' },
+    ]
+  },
+  {
+    label: 'EMERGENCY & TRAUMA',
+    items: [
+      { icon: '🚨', label: 'Emergency Reporting', screen: 'emergency' },
+      { icon: '🩹', label: 'First Aid Guidance', screen: 'firstaid' },
+    ]
+  },
+  {
+    label: 'DATA & REPORTS',
+    items: [
+      { icon: '🔄', label: 'Sync Manager', screen: 'sync' },
+      { icon: '📊', label: 'Reports & Analytics', screen: 'reports' },
+      { icon: '🏥', label: 'ABDM', screen: 'abdm' },
+      { icon: '📁', label: 'Electronic Medical Record', screen: 'emr' },
+    ]
+  }
+];
 
 function DrawerMenu({ isOpen, onClose, onNavigate, activeScreen }) {
   const user = getData('user') || {};

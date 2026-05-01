@@ -45,6 +45,8 @@ import SurveillanceScreen from './screens/SurveillanceScreen';
 import SyncScreen from './screens/SyncScreen';
 import ReportsScreen from './screens/ReportsScreen';
 import ProfileScreen from './screens/ProfileScreen';
+import EMRScreen from './screens/EMRScreen';
+import ABDMScreen from './screens/ABDMScreen';
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState('login');
@@ -128,6 +130,9 @@ function App() {
       case 'reports':         return <ReportsScreen {...props} />;
       // Profile
       case 'profile':         return <ProfileScreen {...props} />;
+      // ABDM & EMR
+      case 'abdm':            return <ABDMScreen {...props} />;
+      case 'emr':             return <EMRScreen {...props} />;
       default:                return <DashboardScreen onNavigate={navigate} />;
     }
   };

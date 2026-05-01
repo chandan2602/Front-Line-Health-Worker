@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import AppBar from '../components/AppBar';
 import FormField from '../components/FormField';
 import BottomNav from '../components/BottomNav';
+import PatientSearchBar from '../components/PatientSearchBar';
 import { getData, appendData } from '../utils/storage';
 
 function ToggleSwitch({ checked, onChange, label }) {
@@ -55,6 +56,11 @@ function ANCScreen({ onNavigate, onBack }) {
       <AppBar title="ANC Services" onBack={onBack} />
 
       <div className="screen-content">
+        {/* ABHA Search */}
+        <PatientSearchBar onPatientFound={p => {
+          const match = patients.find(pw => pw.name === p.name || pw.mobile === p.mobile);
+          if (match) setSelectedPatient(match);
+        }} />
         {/* Patient Search */}
         <div className="card" style={{ marginBottom: 14 }}>
           <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--primary)', marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.05em' }}>

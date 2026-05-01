@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import AppBar from '../components/AppBar';
 import FormField from '../components/FormField';
 import BottomNav from '../components/BottomNav';
+import PatientSearchBar from '../components/PatientSearchBar';
 import { appendData } from '../utils/storage';
 
 function HouseholdScreen({ onNavigate, onBack }) {
@@ -56,6 +57,7 @@ function HouseholdScreen({ onNavigate, onBack }) {
       <AppBar title="Household Enumeration" onBack={onBack} />
 
       <div className="screen-content">
+        <PatientSearchBar onPatientFound={p => update('contact', p.mobile)} />
         {/* Location Section */}
         <div className="card" style={{ marginBottom: 14 }}>
           <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--primary)', marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.05em' }}>

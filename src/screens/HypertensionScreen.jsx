@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { appendData } from '../utils/storage';
+import PatientSearchBar from '../components/PatientSearchBar';
 
 function BackIcon() {
   return <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>;
@@ -30,6 +31,7 @@ export default function HypertensionScreen({ onBack }) {
       </div>
       <div className="screen-content">
         {saved && <div style={{ background: '#DCFCE7', border: '1px solid #16A34A', borderRadius: 12, padding: '12px 16px', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}><span>✅</span><span style={{ fontSize: 14, fontWeight: 600, color: '#16A34A' }}>Screening saved!</span></div>}
+        <PatientSearchBar onPatientFound={p => setForm(f => ({ ...f, name: p.name, age: String(p.age), gender: p.gender, mobile: p.mobile, village: p.village, abhaId: p.abhaId }))} />
         <form onSubmit={handleSave}>
           <div className="card" style={{ marginBottom: 14 }}>
             <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Patient Details</p>
