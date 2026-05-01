@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
 
 function HomeIcon({ active }) {
   return (
@@ -31,6 +32,8 @@ function MoreIcon({ active }) {
 }
 
 function BottomNav({ active = 'home', onNavigate }) {
+  const { t } = useLanguage();
+  
   return (
     <div className="bottom-nav">
       <button
@@ -38,21 +41,21 @@ function BottomNav({ active = 'home', onNavigate }) {
         onClick={() => onNavigate('dashboard')}
       >
         <HomeIcon active={active === 'home'} />
-        <span>Home</span>
+        <span>{t.bottomNav.home}</span>
       </button>
       <button
         className={`bottom-nav-item ${active === 'beneficiary' ? 'active' : ''}`}
         onClick={() => onNavigate('pregnant')}
       >
         <BeneficiaryIcon active={active === 'beneficiary'} />
-        <span>Beneficiary</span>
+        <span>{t.bottomNav.beneficiary}</span>
       </button>
       <button
         className={`bottom-nav-item ${active === 'more' ? 'active' : ''}`}
         onClick={() => onNavigate('sync')}
       >
         <MoreIcon active={active === 'more'} />
-        <span>More</span>
+        <span>{t.bottomNav.more}</span>
       </button>
     </div>
   );

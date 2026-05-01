@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import StepIndicator from '../components/StepIndicator';
+import LanguageSelector from '../components/LanguageSelector';
+import { useLanguage } from '../contexts/LanguageContext';
 
 function GlobeIcon() {
   return (
@@ -83,10 +85,24 @@ function LoginScreen({ onNavigate }) {
   const [showPassword, setShowPassword] = useState(false);
   const [firstTime, setFirstTime] = useState(true);
   const [aadhaarOpen, setAadhaarOpen] = useState(false);
-  const [language, setLanguage] = useState('English');
+
+  const { t } = useLanguage();
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    // Save user data to localStorage
+    const userData = {
+      role: role,
+      userId: userId || 'ANM-MP-2024-00142',
+      name: role === 'ASHA' ? 'Sunita Sharma' : role === 'MPW' ? 'Rajesh Kumar' : role === 'MO' ? 'Dr. Priya Singh' : 'Priya Sharma',
+      center: 'PHC Bhopal Urban, Sub-Center Ward-7',
+      phone: '+91-9876543210',
+      email: userId ? `${userId.toLowerCase()}@mohfw.gov.in` : 'priya.sharma@mohfw.gov.in',
+      district: 'Bhopal',
+      state: 'Madhya Pradesh',
+      joinDate: '15 Jan 2023'
+    };
+    localStorage.setItem('user', JSON.stringify(userData));
     onNavigate('otp');
   };
 
@@ -94,18 +110,7 @@ function LoginScreen({ onNavigate }) {
     <div className="screen" style={{ background: 'var(--bg)' }}>
       {/* Language Selector */}
       <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '12px 16px 0' }}>
-        <button
-          style={{
-            display: 'flex', alignItems: 'center', gap: 6,
-            background: 'white', border: '1px solid var(--border)',
-            borderRadius: 20, padding: '6px 12px',
-            fontSize: 13, fontWeight: 600, color: 'var(--text-primary)',
-            cursor: 'pointer', fontFamily: 'var(--font)'
-          }}
-        >
-          <GlobeIcon />
-          {language} <ChevronIcon />
-        </button>
+        <LanguageSelector variant="white" />
       </div>
 
       {/* Logo & Title */}
@@ -121,8 +126,8 @@ function LoginScreen({ onNavigate }) {
             <path d="M20 13v14M13 20h14" stroke="white" strokeWidth="2.5" strokeLinecap="round"/>
           </svg>
         </div>
-        <h1 style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 4 }}>FLHW App</h1>
-        <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 14 }}>Front Line Health Worker</p>
+        <h1 style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 4 }}>{t.appTitle}</h1>
+        <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 14 }}>{t.appSubtitle}</p>
 
         {/* Badges */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, marginBottom: 4 }}>
@@ -131,14 +136,14 @@ function LoginScreen({ onNavigate }) {
             borderRadius: 20, padding: '5px 14px', fontSize: 11, fontWeight: 600,
             display: 'flex', alignItems: 'center', gap: 5
           }}>
-            🏳️ Ministry of Health &amp; Family Welfare, GoI
+            {t.ministry}
           </span>
           <span style={{
             background: 'rgba(22,163,74,0.1)', color: 'var(--success)',
             borderRadius: 20, padding: '5px 14px', fontSize: 11, fontWeight: 600,
             display: 'flex', alignItems: 'center', gap: 5
           }}>
-            ● Offline-capable · Works without internet
+            {t.offlineCapable}
           </span>
         </div>
       </div>
@@ -152,7 +157,7 @@ function LoginScreen({ onNavigate }) {
       <form onSubmit={handleSubmit} style={{ padding: '8px 16px 24px' }}>
         {/* Login Role */}
         <div className="form-group">
-          <label className="form-label">Login Role</label>
+          <label className="form-label">{t.loginRole}</label>
           <div className="input-wrapper">
             <span className="input-icon-left"><IDCardIcon /></span>
             <select
@@ -160,23 +165,23 @@ function LoginScreen({ onNavigate }) {
               value={role}
               onChange={e => setRole(e.target.value)}
             >
-              <option value="ANM">ANM</option>
-              <option value="ASHA">ASHA / Sahiya</option>
-              <option value="MPW">MPW</option>
-              <option value="MO">Medical Officer</option>
+              <option value="ANM">{t.roles.ANM}</option>
+              <option value="ASHA">{t.roles.ASHA}</option>
+              <option value="MPW">{t.roles.MPW}</option>
+              <option value="MO">{t.roles.MO}</option>
             </select>
           </div>
         </div>
 
         {/* User ID */}
         <div className="form-group">
-          <label className="form-label">User ID / ANM ID / Sahiya ID</label>
+          <label className="form-label">{t.userId}</label>
           <div className="input-wrapper">
             <span className="input-icon-left"><PersonIcon /></span>
             <input
               type="text"
               className="form-input with-icon-left"
-              placeholder="e.g. ANM-MP-2024-00142"
+              placeholder={t.userIdPlaceholder}
               value={userId}
               onChange={e => setUserId(e.target.value)}
             />
@@ -185,13 +190,13 @@ function LoginScreen({ onNavigate }) {
 
         {/* Password */}
         <div className="form-group">
-          <label className="form-label">Password</label>
+          <label className="form-label">{t.password}</label>
           <div className="input-wrapper">
             <span className="input-icon-left"><LockIcon /></span>
             <input
               type={showPassword ? 'text' : 'password'}
               className="form-input with-both-icons"
-              placeholder="Default: Registered mobile number"
+              placeholder={t.passwordPlaceholder}
               value={password}
               onChange={e => setPassword(e.target.value)}
             />
@@ -223,13 +228,13 @@ function LoginScreen({ onNavigate }) {
                 </svg>
               )}
             </div>
-            <span style={{ fontSize: 13, color: 'var(--primary)', fontWeight: 500 }}>First-time login</span>
+            <span style={{ fontSize: 13, color: 'var(--primary)', fontWeight: 500 }}>{t.firstTimeLogin}</span>
           </label>
           <button type="button" style={{
             background: 'none', border: 'none', color: 'var(--primary)',
             fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'var(--font)'
           }}>
-            Forgot Password?
+            {t.forgotPassword}
           </button>
         </div>
 
@@ -249,7 +254,7 @@ function LoginScreen({ onNavigate }) {
           >
             <FingerprintIcon />
             <span style={{ flex: 1, fontSize: 13, fontWeight: 500, color: 'var(--primary)', textAlign: 'left' }}>
-              Link Aadhaar / ABHA ID (Optional)
+              {t.linkAadhaar}
             </span>
             <span style={{ transform: aadhaarOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', color: 'var(--text-secondary)' }}>
               <ChevronIcon />
@@ -258,11 +263,11 @@ function LoginScreen({ onNavigate }) {
           {aadhaarOpen && (
             <div style={{ padding: '0 14px 14px' }}>
               <div className="form-group" style={{ marginBottom: 0 }}>
-                <label className="form-label">Aadhaar / ABHA ID</label>
+                <label className="form-label">{t.linkAadhaar.replace(' (Optional)', '').replace(' (वैकल्पिक)', '').replace(' (ఐచ్ఛికం)', '')}</label>
                 <input
                   type="text"
                   className="form-input"
-                  placeholder="Enter 12-digit Aadhaar or ABHA ID"
+                  placeholder={t.aadhaarPlaceholder}
                 />
               </div>
             </div>
@@ -274,7 +279,7 @@ function LoginScreen({ onNavigate }) {
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.68A2 2 0 012 .84h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/>
           </svg>
-          Send OTP &amp; Continue
+          {t.sendOTP}
         </button>
       </form>
     </div>
