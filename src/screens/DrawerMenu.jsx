@@ -114,6 +114,8 @@ const menuSections = [
     items: [
       { icon: '🔄', label: 'Sync Manager', screen: 'sync' },
       { icon: '📊', label: 'Reports & Analytics', screen: 'reports' },
+      { icon: '🏥', label: 'ABDM', screen: 'abdm' },
+      { icon: '📁', label: 'Electronic Medical Record', screen: 'emr' },
     ]
   }
 ];

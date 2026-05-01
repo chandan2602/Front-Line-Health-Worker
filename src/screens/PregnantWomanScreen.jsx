@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import AppBar from '../components/AppBar';
 import FormField from '../components/FormField';
 import BottomNav from '../components/BottomNav';
+import PatientSearchBar from '../components/PatientSearchBar';
 import { appendData } from '../utils/storage';
 
 const HRP_CONDITIONS = ['Anaemia', 'Pre-eclampsia', 'Hypertension', 'Diabetes', 'HIV', 'Previous C-Section', 'Short Stature'];
@@ -68,6 +69,7 @@ function PregnantWomanScreen({ onNavigate, onBack }) {
       <AppBar title="Pregnant Woman Reg." onBack={onBack} />
 
       <div className="screen-content">
+        <PatientSearchBar onPatientFound={p => setForm(f => ({ ...f, name: p.name, mobile: p.mobile, samagraId: p.abhaId || f.samagraId }))} />
         {/* Identity */}
         <div className="card" style={{ marginBottom: 14 }}>
           <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--primary)', marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.05em' }}>

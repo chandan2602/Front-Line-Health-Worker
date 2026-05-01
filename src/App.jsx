@@ -43,6 +43,8 @@ import TBScreen from './screens/TBScreen';
 import SurveillanceScreen from './screens/SurveillanceScreen';
 import SyncScreen from './screens/SyncScreen';
 import ReportsScreen from './screens/ReportsScreen';
+import EMRScreen from './screens/EMRScreen';
+import ABDMScreen from './screens/ABDMScreen';
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState('login');
@@ -124,6 +126,9 @@ function App() {
       // Reports & Sync
       case 'sync':            return <SyncScreen {...props} />;
       case 'reports':         return <ReportsScreen {...props} />;
+      // ABDM & EMR
+      case 'abdm':            return <ABDMScreen {...props} />;
+      case 'emr':             return <EMRScreen {...props} />;
       default:                return <DashboardScreen onNavigate={navigate} />;
     }
   };

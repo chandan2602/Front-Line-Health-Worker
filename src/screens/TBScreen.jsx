@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import AppBar from '../components/AppBar';
 import FormField from '../components/FormField';
 import BottomNav from '../components/BottomNav';
+import PatientSearchBar from '../components/PatientSearchBar';
 import { getData, appendData } from '../utils/storage';
 
 function TBScreen({ onNavigate, onBack }) {
@@ -59,6 +60,7 @@ function TBScreen({ onNavigate, onBack }) {
       <AppBar title="TB Management" onBack={onBack} />
 
       <div className="screen-content">
+        <PatientSearchBar onPatientFound={p => setForm(f => ({ ...f, name: p.name, age: String(p.age), gender: p.gender }))} />
         {/* Tabs */}
         <div className="tabs">
           {tabs.map(tab => (
