@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { getData } from '../utils/storage';
+import { useLanguage } from '../contexts/LanguageContext';
+import LanguageSelector from '../components/LanguageSelector';
 import DrawerMenu from './DrawerMenu';
 import BottomNav from '../components/BottomNav';
 
@@ -23,16 +25,19 @@ function BellIcon() {
 }
 
 const quickActions = [
-  { icon: '📝', label: 'New Registration', screen: 'pregnant', color: '#EFF6FF', iconBg: '#DBEAFE' },
-  { icon: '🤰', label: 'ANC Visit', screen: 'anc', color: '#F0FDF4', iconBg: '#DCFCE7' },
-  { icon: '🏥', label: 'Delivery', screen: 'delivery', color: '#FFF7ED', iconBg: '#FED7AA' },
-  { icon: '👶', label: 'HBPNC Visit', screen: 'hbpnc', color: '#FDF4FF', iconBg: '#F3E8FF' },
-  { icon: '🩺', label: 'NCD Screening', screen: 'ncd', color: '#FFF1F2', iconBg: '#FFE4E6' },
-  { icon: '💊', label: 'TB Enrollment', screen: 'tb', color: '#F0FDFA', iconBg: '#CCFBF1' },
+  { icon: '📝', label: 'newRegistration', screen: 'pregnant', color: '#EFF6FF', iconBg: '#DBEAFE' },
+  { icon: '🤰', label: 'ancVisit', screen: 'anc', color: '#F0FDF4', iconBg: '#DCFCE7' },
+  { icon: '🏥', label: 'delivery', screen: 'delivery', color: '#FFF7ED', iconBg: '#FED7AA' },
+  { icon: '👶', label: 'hbpncVisit', screen: 'hbpnc', color: '#FDF4FF', iconBg: '#F3E8FF' },
+  { icon: '🩺', label: 'ncdScreening', screen: 'ncd', color: '#FFF1F2', iconBg: '#FFE4E6' },
+  { icon: '💊', label: 'tbEnrollment', screen: 'tb', color: '#F0FDFA', iconBg: '#CCFBF1' },
 ];
 
 function DashboardScreen({ onNavigate }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [roleMenuOpen, setRoleMenuOpen] = useState(false);
+  const [notificationPanelOpen, setNotificationPanelOpen] = useState(false);
+  const { t } = useLanguage();
   const user = getData('user') || {};
   const pregnantWomen = getData('pregnantWomen') || [];
   const ancVisits = getData('ancVisits') || [];
@@ -40,10 +45,41 @@ function DashboardScreen({ onNavigate }) {
 
   const now = new Date();
   const hour = now.getHours();
-  const greeting = hour < 12 ? 'Good Morning' : hour < 17 ? 'Good Afternoon' : 'Good Evening';
+  const greeting = hour < 12 ? t.goodMorning : hour < 17 ? t.goodAfternoon : t.goodEvening;
   const dateStr = now.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 
   const hrpCases = pregnantWomen.filter(w => w.isHRP).length;
+
+  const notifications = [
+    { id: 1, message: t.notificationMessages.hrpAlert, time: '10 min ago', unread: true, icon: '🚨' },
+    { id: 2, message: t.notificationMessages.ancRecorded, time: '2h ago', unread: true, icon: '✅' },
+    { id: 3, message: t.notificationMessages.vaccineReminder, time: '3h ago', unread: true, icon: '💉' },
+    { id: 4, message: t.notificationMessages.hhRegistered, time: '4h ago', unread: false, icon: '🏠' },
+    { id: 5, message: t.notificationMessages.tbUpdated, time: 'Yesterday', unread: false, icon: '💊' },
+    { id: 6, message: t.notificationMessages.syncComplete, time: 'Yesterday', unread: false, icon: '🔄' },
+  ];
+
+  const unreadCount = notifications.filter(n => n.unread).length;
+
+  const handleLogout = () => {
+    if (confirm('Are you sure you want to logout?')) {
+      onNavigate('login');
+    }
+  };
+
+  // Close dropdowns when clicking outside
+  React.useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (roleMenuOpen && !event.target.closest('.role-menu-container')) {
+        setRoleMenuOpen(false);
+      }
+      if (notificationPanelOpen && !event.target.closest('.notification-container')) {
+        setNotificationPanelOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [roleMenuOpen, notificationPanelOpen]);
 
   const dueList = [
     { name: 'Sunita Devi', type: 'ANC Visit', isHRP: true, scheduled: '2nd Visit', id: 1 },
@@ -62,25 +98,230 @@ function DashboardScreen({ onNavigate }) {
         <button className="app-bar-icon-btn" onClick={() => setDrawerOpen(true)} aria-label="Open menu">
           <HamburgerIcon />
         </button>
-        <span style={{ flex: 1, fontSize: 17, fontWeight: 700, textAlign: 'center' }}>FLHW App</span>
+        <span style={{ flex: 1, fontSize: 17, fontWeight: 700, textAlign: 'center' }}>{t.appTitle}</span>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{
-            background: 'rgba(255,255,255,0.2)', borderRadius: 20,
-            padding: '3px 10px', fontSize: 12, fontWeight: 600
-          }}>
-            {user.role || 'ANM'}
-          </span>
-          <div style={{ position: 'relative' }}>
-            <button className="app-bar-icon-btn" aria-label="Notifications">
+          <LanguageSelector variant="transparent" />
+          
+          {/* Role Badge with Dropdown */}
+          <div className="role-menu-container" style={{ position: 'relative' }}>
+            <button
+              onClick={() => setRoleMenuOpen(!roleMenuOpen)}
+              style={{
+                background: 'rgba(255,255,255,0.2)', borderRadius: 20,
+                padding: '3px 10px', fontSize: 12, fontWeight: 600,
+                border: 'none', color: 'white', cursor: 'pointer',
+                fontFamily: 'var(--font)', display: 'flex', alignItems: 'center', gap: 4
+              }}
+            >
+              {user.role || 'ANM'}
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M6 9l6 6 6-6"/>
+              </svg>
+            </button>
+            
+            {/* Role Dropdown Menu */}
+            {roleMenuOpen && (
+              <div style={{
+                position: 'absolute',
+                top: '36px',
+                right: '0',
+                background: 'white',
+                border: '1px solid var(--border)',
+                borderRadius: 12,
+                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                overflow: 'hidden',
+                zIndex: 1000,
+                minWidth: '160px'
+              }}>
+                <button
+                  onClick={() => {
+                    setRoleMenuOpen(false);
+                    onNavigate('profile');
+                  }}
+                  style={{
+                    width: '100%',
+                    padding: '12px 16px',
+                    background: 'white',
+                    border: 'none',
+                    textAlign: 'left',
+                    fontSize: 13,
+                    fontWeight: 500,
+                    color: 'var(--text-primary)',
+                    cursor: 'pointer',
+                    fontFamily: 'var(--font)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 10,
+                    borderBottom: '1px solid var(--border)'
+                  }}
+                  onMouseEnter={(e) => e.target.style.background = 'rgba(0,0,0,0.03)'}
+                  onMouseLeave={(e) => e.target.style.background = 'white'}
+                >
+                  <span style={{ fontSize: 16 }}>👤</span>
+                  {t.profile}
+                </button>
+                <button
+                  onClick={() => {
+                    setRoleMenuOpen(false);
+                    alert('Settings feature coming soon!');
+                  }}
+                  style={{
+                    width: '100%',
+                    padding: '12px 16px',
+                    background: 'white',
+                    border: 'none',
+                    textAlign: 'left',
+                    fontSize: 13,
+                    fontWeight: 500,
+                    color: 'var(--text-primary)',
+                    cursor: 'pointer',
+                    fontFamily: 'var(--font)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 10,
+                    borderBottom: '1px solid var(--border)'
+                  }}
+                  onMouseEnter={(e) => e.target.style.background = 'rgba(0,0,0,0.03)'}
+                  onMouseLeave={(e) => e.target.style.background = 'white'}
+                >
+                  <span style={{ fontSize: 16 }}>⚙️</span>
+                  {t.settings}
+                </button>
+                <button
+                  onClick={handleLogout}
+                  style={{
+                    width: '100%',
+                    padding: '12px 16px',
+                    background: 'white',
+                    border: 'none',
+                    textAlign: 'left',
+                    fontSize: 13,
+                    fontWeight: 600,
+                    color: '#EF4444',
+                    cursor: 'pointer',
+                    fontFamily: 'var(--font)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 10
+                  }}
+                  onMouseEnter={(e) => e.target.style.background = 'rgba(239,68,68,0.05)'}
+                  onMouseLeave={(e) => e.target.style.background = 'white'}
+                >
+                  <span style={{ fontSize: 16 }}>🚪</span>
+                  {t.logout}
+                </button>
+              </div>
+            )}
+          </div>
+          
+          {/* Notification Bell */}
+          <div className="notification-container" style={{ position: 'relative' }}>
+            <button 
+              className="app-bar-icon-btn" 
+              aria-label="Notifications"
+              onClick={() => setNotificationPanelOpen(!notificationPanelOpen)}
+            >
               <BellIcon />
             </button>
-            <span style={{
-              position: 'absolute', top: -2, right: -2,
-              background: '#EF4444', color: 'white',
-              width: 16, height: 16, borderRadius: 50,
-              fontSize: 9, fontWeight: 700,
-              display: 'flex', alignItems: 'center', justifyContent: 'center'
-            }}>3</span>
+            {unreadCount > 0 && (
+              <span style={{
+                position: 'absolute', top: -2, right: -2,
+                background: '#EF4444', color: 'white',
+                width: 16, height: 16, borderRadius: 50,
+                fontSize: 9, fontWeight: 700,
+                display: 'flex', alignItems: 'center', justifyContent: 'center'
+              }}>{unreadCount}</span>
+            )}
+            
+            {/* Notification Panel */}
+            {notificationPanelOpen && (
+              <div style={{
+                position: 'absolute',
+                top: '40px',
+                right: '0',
+                background: 'white',
+                border: '1px solid var(--border)',
+                borderRadius: 12,
+                boxShadow: '0 4px 16px rgba(0,0,0,0.15)',
+                overflow: 'hidden',
+                zIndex: 1000,
+                width: '320px',
+                maxHeight: '400px'
+              }}>
+                {/* Header */}
+                <div style={{
+                  padding: '12px 16px',
+                  borderBottom: '1px solid var(--border)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  background: 'var(--bg)'
+                }}>
+                  <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>
+                    {t.notifications}
+                  </span>
+                  <button
+                    onClick={() => alert('Mark all as read')}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: 'var(--primary)',
+                      fontSize: 11,
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      fontFamily: 'var(--font)'
+                    }}
+                  >
+                    {t.markAllRead}
+                  </button>
+                </div>
+                
+                {/* Notification List */}
+                <div style={{ maxHeight: '340px', overflowY: 'auto' }}>
+                  {notifications.map((notif) => (
+                    <div
+                      key={notif.id}
+                      style={{
+                        padding: '12px 16px',
+                        borderBottom: '1px solid var(--border)',
+                        background: notif.unread ? 'rgba(27,79,155,0.03)' : 'white',
+                        cursor: 'pointer',
+                        transition: 'background 0.2s'
+                      }}
+                      onMouseEnter={(e) => e.target.style.background = 'rgba(0,0,0,0.03)'}
+                      onMouseLeave={(e) => e.target.style.background = notif.unread ? 'rgba(27,79,155,0.03)' : 'white'}
+                    >
+                      <div style={{ display: 'flex', gap: 10 }}>
+                        <span style={{ fontSize: 20, flexShrink: 0 }}>{notif.icon}</span>
+                        <div style={{ flex: 1 }}>
+                          <p style={{ 
+                            fontSize: 13, 
+                            color: 'var(--text-primary)', 
+                            fontWeight: notif.unread ? 600 : 500,
+                            marginBottom: 4
+                          }}>
+                            {notif.message}
+                          </p>
+                          <p style={{ fontSize: 11, color: 'var(--text-secondary)' }}>
+                            {notif.time}
+                          </p>
+                        </div>
+                        {notif.unread && (
+                          <div style={{
+                            width: 8,
+                            height: 8,
+                            borderRadius: 50,
+                            background: 'var(--primary)',
+                            flexShrink: 0,
+                            marginTop: 4
+                          }} />
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -96,7 +337,7 @@ function DashboardScreen({ onNavigate }) {
             background: syncQueue.length > 0 ? '#FCD34D' : '#4ADE80'
           }} />
           <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.85)' }}>
-            {syncQueue.length > 0 ? `${syncQueue.length} records pending sync` : 'All data synced'}
+            {syncQueue.length > 0 ? `${syncQueue.length} ${t.recordsPendingSync}` : t.allDataSynced}
           </span>
         </div>
         <button
@@ -104,7 +345,7 @@ function DashboardScreen({ onNavigate }) {
           onClick={() => onNavigate('sync')}
           style={{ fontSize: 12, padding: '6px 14px' }}
         >
-          🔄 Sync Now
+          {t.syncNow}
         </button>
       </div>
 
@@ -124,13 +365,13 @@ function DashboardScreen({ onNavigate }) {
             <div className="stat-card-value" style={{ color: 'var(--primary)' }}>
               {dueList.length}
             </div>
-            <div className="stat-card-label">Today's Tasks</div>
+            <div className="stat-card-label">{t.todaysTasks}</div>
           </div>
           <div className="stat-card">
             <div className="stat-card-value" style={{ color: '#B45309' }}>
               {syncQueue.length || 5}
             </div>
-            <div className="stat-card-label">Pending Sync</div>
+            <div className="stat-card-label">{t.pendingSync}</div>
           </div>
           <div className="stat-card">
             <div className="stat-card-value" style={{ color: 'var(--danger)' }}>
@@ -139,15 +380,15 @@ function DashboardScreen({ onNavigate }) {
                 {hrpCases}
               </span>
             </div>
-            <div className="stat-card-label">HRP Cases</div>
+            <div className="stat-card-label">{t.hrpCases}</div>
           </div>
         </div>
 
         {/* Today's Due List */}
         <div style={{ marginBottom: 20 }}>
           <div className="section-header">
-            <span className="section-title">Today's Due List</span>
-            <button className="section-link">See all</button>
+            <span className="section-title">{t.todaysDueList}</span>
+            <button className="section-link">{t.seeAll}</button>
           </div>
 
           {dueList.map((item) => (
@@ -176,7 +417,7 @@ function DashboardScreen({ onNavigate }) {
                 onClick={() => onNavigate('anc')}
                 style={{ fontSize: 11, padding: '6px 10px', width: 'auto', flexShrink: 0 }}
               >
-                Start
+                {t.start}
               </button>
             </div>
           ))}
@@ -185,7 +426,7 @@ function DashboardScreen({ onNavigate }) {
         {/* Quick Actions */}
         <div style={{ marginBottom: 20 }}>
           <div className="section-header">
-            <span className="section-title">Quick Actions</span>
+            <span className="section-title">{t.quickActions}</span>
           </div>
           <div className="quick-actions-grid">
             {quickActions.map((action) => (
@@ -197,7 +438,7 @@ function DashboardScreen({ onNavigate }) {
                 <div className="quick-action-icon" style={{ background: action.iconBg }}>
                   {action.icon}
                 </div>
-                <span className="quick-action-label">{action.label}</span>
+                <span className="quick-action-label">{t.quickActionLabels[action.label]}</span>
               </button>
             ))}
           </div>
@@ -206,7 +447,7 @@ function DashboardScreen({ onNavigate }) {
         {/* Recent Activity */}
         <div style={{ marginBottom: 20 }}>
           <div className="section-header">
-            <span className="section-title">Recent Activity</span>
+            <span className="section-title">{t.recentActivity}</span>
           </div>
           <div className="card">
             {[

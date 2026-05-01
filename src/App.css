@@ -24,57 +24,27 @@
 
 body {
   font-family: var(--font);
-  background: #CBD5E1;
+  background: var(--bg);
   min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
+  margin: 0;
+  padding: 0;
 }
 
-/* ===== MOBILE FRAME ===== */
-.mobile-frame-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
+/* ===== APP ROOT — full viewport ===== */
+.app-root {
   width: 100%;
-  background: linear-gradient(135deg, #94A3B8 0%, #64748B 100%);
-  padding: 20px;
-}
-
-.mobile-frame {
-  width: 390px;
-  min-height: 844px;
-  background: #FFFFFF;
-  border-radius: 48px;
-  box-shadow:
-    0 0 0 10px #1A1A2E,
-    0 0 0 12px #374151,
-    0 30px 80px rgba(0,0,0,0.5);
-  overflow: hidden;
-  position: relative;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background: var(--bg);
 }
 
-/* ===== STATUS BAR ===== */
-.status-bar {
-  background: var(--primary);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 20px 6px;
-  font-size: 12px;
-  font-weight: 600;
-  flex-shrink: 0;
-  min-height: 28px;
-}
+/* ===== MOBILE FRAME (kept for reference, no longer used) ===== */
+.mobile-frame-wrapper { display: none; }
+.mobile-frame { display: none; }
 
-.status-bar-time { font-weight: 700; font-size: 13px; }
-.status-bar-icons { display: flex; align-items: center; gap: 5px; }
-.status-bar-icons svg { width: 14px; height: 14px; fill: white; }
+/* ===== STATUS BAR (hidden — no longer using phone frame) ===== */
+.status-bar { display: none; }
 
 /* ===== SCREEN CONTAINER ===== */
 .screen {
@@ -86,6 +56,10 @@ body {
   flex-direction: column;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
+  min-height: 100vh;
+  max-width: 480px;
+  margin: 0 auto;
+  width: 100%;
 }
 .screen::-webkit-scrollbar { display: none; }
 
@@ -410,16 +384,16 @@ select.form-input {
 
 /* ===== DRAWER OVERLAY ===== */
 .drawer-overlay {
-  position: absolute;
+  position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
   background: rgba(0,0,0,0.5);
   z-index: 100;
   transition: opacity 0.3s;
 }
 .drawer {
-  position: absolute;
+  position: fixed;
   top: 0; left: 0; bottom: 0;
-  width: 300px;
+  width: min(300px, 85vw);
   background: white;
   z-index: 101;
   display: flex;

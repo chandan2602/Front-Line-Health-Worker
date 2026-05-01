@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import { initDummyData } from './utils/storage';
+import { LanguageProvider } from './contexts/LanguageContext';
 import MobileFrame from './components/MobileFrame';
 import LoginScreen from './screens/LoginScreen';
 import OTPScreen from './screens/OTPScreen';
@@ -43,6 +44,7 @@ import TBScreen from './screens/TBScreen';
 import SurveillanceScreen from './screens/SurveillanceScreen';
 import SyncScreen from './screens/SyncScreen';
 import ReportsScreen from './screens/ReportsScreen';
+import ProfileScreen from './screens/ProfileScreen';
 import EMRScreen from './screens/EMRScreen';
 import ABDMScreen from './screens/ABDMScreen';
 import RoleManagementScreen from './screens/RoleManagementScreen';
@@ -127,6 +129,8 @@ function App() {
       // Reports & Sync
       case 'sync':            return <SyncScreen {...props} />;
       case 'reports':         return <ReportsScreen {...props} />;
+      // Profile
+      case 'profile':         return <ProfileScreen {...props} />;
       // ABDM & EMR
       case 'abdm':            return <ABDMScreen {...props} />;
       case 'emr':             return <EMRScreen {...props} />;
@@ -136,9 +140,11 @@ function App() {
   };
 
   return (
-    <div className="mobile-frame-wrapper">
-      <MobileFrame>{renderScreen()}</MobileFrame>
-    </div>
+    <LanguageProvider>
+      <div className="app-root">
+        {renderScreen()}
+      </div>
+    </LanguageProvider>
   );
 }
 

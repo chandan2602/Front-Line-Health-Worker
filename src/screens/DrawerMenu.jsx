@@ -1,6 +1,8 @@
 import React from 'react';
 import { getData } from '../utils/storage';
 
+import { useLanguage } from '../contexts/LanguageContext';
+
 const menuSections = [
   {
     label: 'MAIN',
@@ -128,6 +130,126 @@ const menuSections = [
 
 function DrawerMenu({ isOpen, onClose, onNavigate, activeScreen }) {
   const user = getData('user') || {};
+  const { t } = useLanguage();
+
+  const menuSections = [
+    {
+      label: t.menuSections.main,
+      items: [
+        { icon: '🏠', label: t.menuItems.homeDashboard, screen: 'dashboard' },
+        { icon: '🏘', label: t.menuItems.householdEnumeration, screen: 'household' },
+      ]
+    },
+    {
+      label: t.menuSections.maternalHealth,
+      items: [
+        { icon: '👫', label: t.menuItems.ecRegistration, screen: 'ec' },
+        { icon: '🤰', label: t.menuItems.pregnantWomanReg, screen: 'pregnant' },
+        { icon: '❤️', label: t.menuItems.ancServices, screen: 'anc' },
+        { icon: '🏥', label: t.menuItems.deliveryTracking, screen: 'delivery' },
+        { icon: '🏠', label: t.menuItems.hbpnc, screen: 'hbpnc' },
+      ]
+    },
+    {
+      label: t.menuSections.childHealth,
+      items: [
+        { icon: '👶', label: t.menuItems.childRegistration, screen: 'child' },
+        { icon: '💉', label: t.menuItems.vaccinationDueList, screen: 'vaccination' },
+        { icon: '🍼', label: t.menuItems.hbnc, screen: 'hbnc' },
+        { icon: '🌱', label: t.menuItems.hbyc, screen: 'hbyc' },
+        { icon: '📊', label: t.menuItems.hbncHbycReport, screen: 'hbncreport' },
+      ]
+    },
+    {
+      label: t.menuSections.familyPlanning,
+      items: [
+        { icon: '💬', label: t.menuItems.fpCounseling, screen: 'fpcounseling' },
+        { icon: '🏥', label: t.menuItems.fpServices, screen: 'fpservices' },
+      ]
+    },
+    {
+      label: t.menuSections.adolescentHealth,
+      items: [
+        { icon: '🧑', label: t.menuItems.adolescentRegistration, screen: 'adolescent' },
+        { icon: '🔍', label: t.menuItems.adolescentScreening, screen: 'adolescentscreen' },
+      ]
+    },
+    {
+      label: t.menuSections.mchServices,
+      items: [
+        { icon: '📋', label: t.menuItems.vhsndSessions, screen: 'vhsnd' },
+      ]
+    },
+    {
+      label: t.menuSections.communicableDiseases,
+      items: [
+        { icon: '🫁', label: t.menuItems.tbScreening, screen: 'tbscreening' },
+        { icon: '⚙️', label: t.menuItems.tbManagement, screen: 'tb' },
+        { icon: '🤒', label: t.menuItems.sickPersonReport, screen: 'surveillance' },
+        { icon: '🎯', label: t.menuItems.surveillance, screen: 'surveillance' },
+      ]
+    },
+    {
+      label: t.menuSections.ncds,
+      items: [
+        { icon: '📋', label: t.menuItems.cbacRiskAssessment, screen: 'cbac' },
+        { icon: '💓', label: t.menuItems.hypertensionScreening, screen: 'hypertension' },
+        { icon: '🩸', label: t.menuItems.diabetesScreening, screen: 'diabetes' },
+        { icon: '👄', label: t.menuItems.oralScreening, screen: 'oralscreening' },
+        { icon: '🎗️', label: t.menuItems.breastCervicalScreening, screen: 'breastcervical' },
+        { icon: '🛡️', label: t.menuItems.ncdScreeningCbac, screen: 'ncd' },
+      ]
+    },
+    {
+      label: t.menuSections.geriatricCare,
+      items: [
+        { icon: '👴', label: t.menuItems.geriatricRegistration, screen: 'geriatricreg' },
+        { icon: '🔬', label: t.menuItems.geriatricScreening, screen: 'geriatricscreen' },
+      ]
+    },
+    {
+      label: t.menuSections.palliativeCare,
+      items: [
+        { icon: '🕊️', label: t.menuItems.palliativeRegistration, screen: 'palliativereg' },
+        { icon: '📝', label: t.menuItems.palliativeCarePlan, screen: 'palliativeplan' },
+      ]
+    },
+    {
+      label: t.menuSections.mentalHealth,
+      items: [
+        { icon: '🧠', label: t.menuItems.mentalHealthScreening, screen: 'mentalhealth' },
+        { icon: '💭', label: t.menuItems.counselingSession, screen: 'counseling' },
+      ]
+    },
+    {
+      label: t.menuSections.oralHealth,
+      items: [
+        { icon: '🦷', label: t.menuItems.oralHealthEducation, screen: 'oraleducation' },
+      ]
+    },
+    {
+      label: t.menuSections.entCare,
+      items: [
+        { icon: '👂', label: t.menuItems.entScreening, screen: 'ent' },
+      ]
+    },
+    {
+      label: t.menuSections.emergencyTrauma,
+      items: [
+        { icon: '🚨', label: t.menuItems.emergencyReporting, screen: 'emergency' },
+        { icon: '🩹', label: t.menuItems.firstAidGuidance, screen: 'firstaid' },
+      ]
+    },
+    {
+      label: t.menuSections.dataReports,
+      items: [
+        { icon: '🔄', label: t.menuItems.syncManager, screen: 'sync' },
+        { icon: '📊', label: t.menuItems.reportsAnalytics, screen: 'reports' },
+        { icon: '🏥', label: 'ABDM', screen: 'abdm' },
+        { icon: '📁', label: 'Electronic Medical Record', screen: 'emr' },
+      ]
+    }
+  ];
 
   const handleItemClick = (screen) => {
     onClose();
@@ -197,7 +319,7 @@ function DrawerMenu({ isOpen, onClose, onNavigate, activeScreen }) {
 
         {/* Footer */}
         <div className="drawer-footer">
-          FLHW App v2.0 · MoHFW, GoI
+          {t.drawerFooter}
         </div>
       </div>
     </>
