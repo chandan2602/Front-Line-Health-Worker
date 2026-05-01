@@ -692,7 +692,7 @@ export default function EMRScreen({ onBack, onNavigate }) {
       {/* App Bar */}
       <div style={{ background: 'var(--primary)', display: 'flex', alignItems: 'center', padding: '12px 16px', gap: 12, flexShrink: 0 }}>
         <button className="app-bar-icon-btn" onClick={onBack}><BackIcon /></button>
-        <span style={{ flex: 1, fontSize: 17, fontWeight: 700, color: 'white', textAlign: 'center' }}>Electronic Medical Record</span>
+        <span style={{ flex: 1, fontSize: 17, fontWeight: 700, color: 'white', textAlign: 'center' }}>Electronic Medical Record(EMR)</span>
         <div style={{ width: 30 }} />
       </div>
 

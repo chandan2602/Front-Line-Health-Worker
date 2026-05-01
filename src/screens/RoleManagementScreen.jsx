@@ -46,7 +46,7 @@ const ALL_SCREENS = [
   { key: 'sync',            label: 'Sync Manager',            icon: '🔄', section: 'DATA & REPORTS' },
   { key: 'reports',         label: 'Reports & Analytics',     icon: '📊', section: 'DATA & REPORTS' },
   { key: 'abdm',            label: 'ABDM',                    icon: '🏥', section: 'DATA & REPORTS' },
-  { key: 'emr',             label: 'Electronic Medical Record',icon: '📁', section: 'DATA & REPORTS' },
+  { key: 'emr',             label: 'Electronic Medical Record(EMR)',icon: '📁', section: 'DATA & REPORTS' },
   { key: 'roles',           label: 'Role Management',         icon: '🔐', section: 'ADMINISTRATION' },
 ];
 

@@ -117,7 +117,7 @@ const menuSections = [
       { icon: '🔄', label: 'Sync Manager', screen: 'sync' },
       { icon: '📊', label: 'Reports & Analytics', screen: 'reports' },
       { icon: '🏥', label: 'ABDM', screen: 'abdm' },
-      { icon: '📁', label: 'Electronic Medical Record', screen: 'emr' },
+      { icon: '📁', label: 'Electronic Medical Record(EMR)', screen: 'emr' },
     ]
   },
   {
@@ -138,6 +138,8 @@ function DrawerMenu({ isOpen, onClose, onNavigate, activeScreen }) {
       items: [
         { icon: '🏠', label: t.menuItems.homeDashboard, screen: 'dashboard' },
         { icon: '🏘', label: t.menuItems.householdEnumeration, screen: 'household' },
+        { icon: '🏥', label: 'ABDM', screen: 'abdm' },
+        { icon: '📁', label: 'Electronic Medical Record(EMR)', screen: 'emr' },
       ]
     },
     {
@@ -245,8 +247,6 @@ function DrawerMenu({ isOpen, onClose, onNavigate, activeScreen }) {
       items: [
         { icon: '🔄', label: t.menuItems.syncManager, screen: 'sync' },
         { icon: '📊', label: t.menuItems.reportsAnalytics, screen: 'reports' },
-        { icon: '🏥', label: 'ABDM', screen: 'abdm' },
-        { icon: '📁', label: 'Electronic Medical Record', screen: 'emr' },
       ]
     },
     {
@@ -302,7 +302,7 @@ function DrawerMenu({ isOpen, onClose, onNavigate, activeScreen }) {
         {/* Menu Body */}
         <div style={{ flex: 1, overflowY: 'auto', scrollbarWidth: 'none' }}>
           {menuSections.map((section) => (
-            <div key={section.label}>
+            <div key={section.label} data-section={section.label}>
               <div className="drawer-section-label">{section.label}</div>
               {section.items.map((item, idx) => (
                 <button

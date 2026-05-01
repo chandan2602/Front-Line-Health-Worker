@@ -4,6 +4,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import LanguageSelector from '../components/LanguageSelector';
 import DrawerMenu from './DrawerMenu';
 import BottomNav from '../components/BottomNav';
+import AIAssistant from '../components/AIAssistant';
 
 function HamburgerIcon() {
   return (
@@ -33,10 +34,87 @@ const quickActions = [
   { icon: '💊', label: 'tbEnrollment', screen: 'tb', color: '#F0FDFA', iconBg: '#CCFBF1' },
 ];
 
+const sectionActions = {
+  'MAIN': [
+    { icon: '🏠', label: 'Home Dashboard', screen: 'dashboard', iconBg: '#DBEAFE' },
+    { icon: '🏘', label: 'Household', screen: 'household', iconBg: '#E0E7FF' },
+    { icon: '🏥', label: 'ABDM', screen: 'abdm', iconBg: '#DBEAFE' },
+    { icon: '📁', label: 'EMR', screen: 'emr', iconBg: '#E0E7FF' },
+  ],
+  'MATERNAL HEALTH': [
+    { icon: '👫', label: 'EC Registration', screen: 'ec', iconBg: '#FECACA' },
+    { icon: '🤰', label: 'Pregnant Woman', screen: 'pregnant', iconBg: '#FED7AA' },
+    { icon: '❤️', label: 'ANC Services', screen: 'anc', iconBg: '#DCFCE7' },
+    { icon: '🏥', label: 'Delivery', screen: 'delivery', iconBg: '#FED7AA' },
+    { icon: '🏠', label: 'HBPNC', screen: 'hbpnc', iconBg: '#F3E8FF' },
+  ],
+  'CHILD HEALTH': [
+    { icon: '👶', label: 'Child Registration', screen: 'child', iconBg: '#FED7AA' },
+    { icon: '💉', label: 'Vaccination', screen: 'vaccination', iconBg: '#DCFCE7' },
+    { icon: '🍼', label: 'HBNC', screen: 'hbnc', iconBg: '#DBEAFE' },
+    { icon: '🌱', label: 'HBYC', screen: 'hbyc', iconBg: '#D1FAE5' },
+    { icon: '📊', label: 'HBNC Report', screen: 'hbncreport', iconBg: '#E0E7FF' },
+  ],
+  'FAMILY PLANNING': [
+    { icon: '💬', label: 'FP Counseling', screen: 'fpcounseling', iconBg: '#DDD6FE' },
+    { icon: '🏥', label: 'FP Services', screen: 'fpservices', iconBg: '#DBEAFE' },
+  ],
+  'ADOLESCENT HEALTH': [
+    { icon: '🧑', label: 'Adolescent Reg.', screen: 'adolescent', iconBg: '#BFDBFE' },
+    { icon: '🔍', label: 'Screening', screen: 'adolescentscreen', iconBg: '#E0E7FF' },
+  ],
+  'MCH SERVICES': [
+    { icon: '📋', label: 'VHSND Sessions', screen: 'vhsnd', iconBg: '#DBEAFE' },
+  ],
+  'COMMUNICABLE DISEASES': [
+    { icon: '🫁', label: 'TB Screening', screen: 'tbscreening', iconBg: '#FEF3C7' },
+    { icon: '⚙️', label: 'TB Management', screen: 'tb', iconBg: '#CCFBF1' },
+    { icon: '🎯', label: 'Surveillance', screen: 'surveillance', iconBg: '#FED7AA' },
+  ],
+  'NCDs': [
+    { icon: '📋', label: 'CBAC', screen: 'cbac', iconBg: '#FBCFE8' },
+    { icon: '💓', label: 'Hypertension', screen: 'hypertension', iconBg: '#FECACA' },
+    { icon: '🩸', label: 'Diabetes', screen: 'diabetes', iconBg: '#FED7AA' },
+    { icon: '👄', label: 'Oral Screening', screen: 'oralscreening', iconBg: '#DBEAFE' },
+    { icon: '🎗️', label: 'Breast/Cervical', screen: 'breastcervical', iconBg: '#FBCFE8' },
+    { icon: '🛡️', label: 'NCD Screening', screen: 'ncd', iconBg: '#FFE4E6' },
+  ],
+  'GERIATRIC CARE': [
+    { icon: '👴', label: 'Geriatric Reg.', screen: 'geriatricreg', iconBg: '#E9D5FF' },
+    { icon: '🔬', label: 'Screening', screen: 'geriatricscreen', iconBg: '#DDD6FE' },
+  ],
+  'PALLIATIVE CARE': [
+    { icon: '🕊️', label: 'Palliative Reg.', screen: 'palliativereg', iconBg: '#E0E7FF' },
+    { icon: '📝', label: 'Care Plan', screen: 'palliativeplan', iconBg: '#DBEAFE' },
+  ],
+  'MENTAL HEALTH': [
+    { icon: '🧠', label: 'Mental Health', screen: 'mentalhealth', iconBg: '#DDD6FE' },
+    { icon: '💭', label: 'Counseling', screen: 'counseling', iconBg: '#E9D5FF' },
+  ],
+  'ORAL HEALTH': [
+    { icon: '🦷', label: 'Oral Education', screen: 'oraleducation', iconBg: '#DBEAFE' },
+  ],
+  'ENT CARE': [
+    { icon: '👂', label: 'ENT Screening', screen: 'ent', iconBg: '#FED7AA' },
+  ],
+  'EMERGENCY & TRAUMA': [
+    { icon: '🚨', label: 'Emergency', screen: 'emergency', iconBg: '#FECACA' },
+    { icon: '🩹', label: 'First Aid', screen: 'firstaid', iconBg: '#FED7AA' },
+  ],
+  'DATA & REPORTS': [
+    { icon: '🔄', label: 'Sync Manager', screen: 'sync', iconBg: '#DBEAFE' },
+    { icon: '📊', label: 'Reports', screen: 'reports', iconBg: '#E0E7FF' },
+  ],
+  'ADMINISTRATION': [
+    { icon: '🔐', label: 'Role Management', screen: 'roles', iconBg: '#FED7AA' },
+  ],
+};
+
 function DashboardScreen({ onNavigate }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [roleMenuOpen, setRoleMenuOpen] = useState(false);
   const [notificationPanelOpen, setNotificationPanelOpen] = useState(false);
+  const [selectedSection, setSelectedSection] = useState('MATERNAL HEALTH');
   const { t } = useLanguage();
   const user = getData('user') || {};
   const pregnantWomen = getData('pregnantWomen') || [];
@@ -427,9 +505,42 @@ function DashboardScreen({ onNavigate }) {
         <div style={{ marginBottom: 20 }}>
           <div className="section-header">
             <span className="section-title">{t.quickActions}</span>
+            <select
+              value={selectedSection}
+              onChange={(e) => setSelectedSection(e.target.value)}
+              style={{
+                padding: '6px 12px',
+                fontSize: 12,
+                fontWeight: 600,
+                color: 'var(--primary)',
+                background: 'white',
+                border: '1.5px solid var(--primary)',
+                borderRadius: 8,
+                cursor: 'pointer',
+                fontFamily: 'var(--font)',
+                outline: 'none'
+              }}
+            >
+              <option value="MAIN">Main</option>
+              <option value="MATERNAL HEALTH">Maternal Health</option>
+              <option value="CHILD HEALTH">Child Health</option>
+              <option value="FAMILY PLANNING">Family Planning</option>
+              <option value="ADOLESCENT HEALTH">Adolescent Health</option>
+              <option value="MCH SERVICES">MCH Services</option>
+              <option value="COMMUNICABLE DISEASES">Communicable Diseases</option>
+              <option value="NCDs">NCDs</option>
+              <option value="GERIATRIC CARE">Geriatric Care</option>
+              <option value="PALLIATIVE CARE">Palliative Care</option>
+              <option value="MENTAL HEALTH">Mental Health</option>
+              <option value="ORAL HEALTH">Oral Health</option>
+              <option value="ENT CARE">ENT Care</option>
+              <option value="EMERGENCY & TRAUMA">Emergency & Trauma</option>
+              <option value="DATA & REPORTS">Data & Reports</option>
+              <option value="ADMINISTRATION">Administration</option>
+            </select>
           </div>
           <div className="quick-actions-grid">
-            {quickActions.map((action) => (
+            {(sectionActions[selectedSection] || []).map((action) => (
               <button
                 key={action.screen}
                 className="quick-action-item"
@@ -438,7 +549,7 @@ function DashboardScreen({ onNavigate }) {
                 <div className="quick-action-icon" style={{ background: action.iconBg }}>
                   {action.icon}
                 </div>
-                <span className="quick-action-label">{t.quickActionLabels[action.label]}</span>
+                <span className="quick-action-label">{action.label}</span>
               </button>
             ))}
           </div>
@@ -481,6 +592,9 @@ function DashboardScreen({ onNavigate }) {
         onNavigate={onNavigate}
         activeScreen="dashboard"
       />
+
+      {/* AI Assistant */}
+      <AIAssistant />
     </div>
   );
 }
