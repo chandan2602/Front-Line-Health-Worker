@@ -136,64 +136,69 @@ function Sparkline({ points, color = 'var(--primary)', height = 40, width = 120 
   );
 }
 
-// ── Analytics / Summary panel ───────────────────────────────────────────────
+// ── LHRM phase definitions — single source of truth ─────────────────────────
+const LHRM_PHASES = [
+  { key: 'birth',      label: 'Birth & Newborn',  icon: '👶', color: '#0891B2', ageStart: 0,  ageEnd: 1,  program: 'HBNC / HBPNC',    events: 5, status: 'normal' },
+  { key: 'infant',     label: 'Infant & Child',   icon: '🍼', color: '#16A34A', ageStart: 1,  ageEnd: 5,  program: 'HBYC / Immunization', events: 4, status: 'normal' },
+  { key: 'school',     label: 'School Age',       icon: '🧒', color: '#F59E0B', ageStart: 6,  ageEnd: 14, program: 'RBSK / School Health', events: 3, status: 'watch'  },
+  { key: 'adolescent', label: 'Adolescent',       icon: '🧑', color: '#7C3AED', ageStart: 15, ageEnd: 19, program: 'RKSK / WIFS',       events: 3, status: 'normal' },
+  { key: 'rch',        label: 'Maternal / RCH',   icon: '🤰', color: '#DC2626', ageStart: 20, ageEnd: 45, program: 'RCH / ANC / FP',    events: 5, status: 'watch'  },
+  { key: 'ncd',        label: 'NCD / Chronic',    icon: '💊', color: '#B45309', ageStart: 30, ageEnd: 60, program: 'NCD / HTN / DM',    events: 3, status: 'alert'  },
+  { key: 'geriatric',  label: 'Geriatric',        icon: '👴', color: '#6B7280', ageStart: 60, ageEnd: 80, program: 'Geriatric / Palliative', events: 1, status: 'normal' },
+];
+const STATUS_COLOR = { normal: '#16A34A', watch: '#F59E0B', alert: '#DC2626' };
+
+// ── Analytics / Summary panel (LHRM-aligned) ────────────────────────────────
 function PatientSummary({ patient }) {
-  const totalRecords = RECORD_SECTIONS.reduce((a, s) => a + s.records.length, 0);
-  const activeSections = RECORD_SECTIONS.filter(s => s.records.length > 0).length;
+  const activePhases = LHRM_PHASES.filter(p => patient.age >= p.ageStart);
+  const totalEvents  = activePhases.reduce((a, p) => a + p.events, 0);
 
-  // Records-per-category bar chart data
-  const barData = RECORD_SECTIONS.filter(s => s.records.length > 0).map(s => ({
-    label: s.label.split(' ')[0],
-    value: s.records.length,
-  }));
-
-  // Health status donut
+  const normalCount = activePhases.filter(p => p.status === 'normal').length;
+  const watchCount  = activePhases.filter(p => p.status === 'watch').length;
+  const alertCount  = activePhases.filter(p => p.status === 'alert').length;
   const donutSegments = [
-    { label: 'Normal', value: 7, color: '#16A34A' },
-    { label: 'Watch', value: 3, color: '#F59E0B' },
-    { label: 'Alert', value: 1, color: '#DC2626' },
-  ];
+    { label: 'Normal', value: normalCount, color: '#16A34A' },
+    { label: 'Watch',  value: watchCount,  color: '#F59E0B' },
+    { label: 'Alert',  value: alertCount,  color: '#DC2626' },
+  ].filter(s => s.value > 0);
 
-  // BP trend (systolic)
-  const bpTrend = [116, 118, 122, 138];
-  const hbTrend = [10.8, 11.2, 11.0, 11.5];
+  const bpTrend     = [116, 118, 122, 138];
+  const hbTrend     = [10.2, 10.8, 11.2, 11.5];
   const weightTrend = [55, 58, 60, 62];
-
-  // Vaccination coverage
-  const vaccTotal = 9, vaccDone = 4;
+  const vaccDone = 5, vaccTotal = 9;
+  const healthScore = Math.max(0, 100 - watchCount * 5 - alertCount * 10 - 6);
 
   return (
     <div>
-      {/* Health Score Card */}
-      <div style={{
-        background: 'linear-gradient(135deg, #1B4F9B 0%, #2563EB 100%)',
-        borderRadius: 16, padding: '16px', marginBottom: 14, color: 'white'
-      }}>
-        <p style={{ fontSize: 12, opacity: 0.8, marginBottom: 6, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Overall Health Score</p>
+      {/* Health Score */}
+      <div style={{ background: 'linear-gradient(135deg, #1B4F9B 0%, #2563EB 100%)', borderRadius: 16, padding: '16px', marginBottom: 14, color: 'white' }}>
+        <p style={{ fontSize: 11, opacity: 0.8, marginBottom: 6, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Overall Health Score</p>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
           <div>
-            <p style={{ fontSize: 42, fontWeight: 800, lineHeight: 1 }}>74</p>
-            <p style={{ fontSize: 11, opacity: 0.75, marginTop: 4 }}>out of 100 · Good</p>
+            <p style={{ fontSize: 42, fontWeight: 800, lineHeight: 1 }}>{healthScore}</p>
+            <p style={{ fontSize: 11, opacity: 0.75, marginTop: 4 }}>out of 100 · {healthScore >= 80 ? 'Excellent' : healthScore >= 60 ? 'Good' : 'Needs Attention'}</p>
           </div>
           <div style={{ flex: 1 }}>
             <div style={{ height: 8, background: 'rgba(255,255,255,0.2)', borderRadius: 4, overflow: 'hidden', marginBottom: 8 }}>
-              <div style={{ height: '100%', width: '74%', background: 'white', borderRadius: 4 }} />
+              <div style={{ height: '100%', width: `${healthScore}%`, background: 'white', borderRadius: 4 }} />
             </div>
-            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-              {[['✅', 'Normal BP'], ['⚠️', 'Pre-HTN'], ['✅', 'Normal BS']].map(([ic, lb]) => (
-                <span key={lb} style={{ fontSize: 10, opacity: 0.9 }}>{ic} {lb}</span>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              {activePhases.map(p => (
+                <span key={p.key} style={{ fontSize: 10, opacity: 0.9 }}>
+                  {p.status === 'normal' ? '✅' : p.status === 'watch' ? '⚠️' : '🔴'} {p.label.split(' ')[0]}
+                </span>
               ))}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Quick stats row */}
+      {/* Quick stats */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginBottom: 14 }}>
         {[
-          { label: 'Records', value: totalRecords, icon: '📄', color: '#EFF6FF', text: 'var(--primary)' },
-          { label: 'Sections', value: activeSections, icon: '📂', color: '#F0FDF4', text: '#16A34A' },
-          { label: 'Visits', value: 6, icon: '🏥', color: '#FFF7ED', text: '#B45309' },
+          { label: 'Total Events', value: totalEvents,         icon: '📄', color: '#EFF6FF', text: 'var(--primary)' },
+          { label: 'Life Phases',  value: activePhases.length, icon: '🗂️', color: '#F0FDF4', text: '#16A34A' },
+          { label: 'Programs',     value: activePhases.length, icon: '🏥', color: '#FFF7ED', text: '#B45309' },
         ].map(s => (
           <div key={s.label} style={{ background: s.color, borderRadius: 12, padding: '12px 8px', textAlign: 'center' }}>
             <p style={{ fontSize: 18 }}>{s.icon}</p>
@@ -203,69 +208,87 @@ function PatientSummary({ patient }) {
         ))}
       </div>
 
-      {/* Records by Category bar chart */}
+      {/* Events by LHRM Phase — multi-color bar chart */}
       <div className="card" style={{ marginBottom: 14 }}>
-        <p style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-          📊 Records by Category
-        </p>
-        <BarChart data={barData} color="var(--primary)" />
+        <p style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 2, textTransform: 'uppercase', letterSpacing: '0.06em' }}>📊 Events by Life Phase (LHRM)</p>
+        <p style={{ fontSize: 10, color: 'var(--text-secondary)', marginBottom: 12 }}>Health events recorded across each life stage</p>
+        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 5, height: 80 }}>
+          {activePhases.map((ph) => {
+            const max = Math.max(...activePhases.map(x => x.events), 1);
+            return (
+              <div key={ph.key} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+                <span style={{ fontSize: 10, color: ph.color, fontWeight: 700 }}>{ph.events}</span>
+                <div style={{ width: '100%', borderRadius: '4px 4px 0 0', background: ph.color, height: `${Math.max((ph.events / max) * 52, 6)}px` }} />
+                <span style={{ fontSize: 14 }}>{ph.icon}</span>
+                <span style={{ fontSize: 8, color: 'var(--text-secondary)', textAlign: 'center' }}>{ph.ageStart}–{ph.ageEnd}y</span>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
-      {/* Health Status donut */}
+      {/* Health Status by Phase — donut */}
       <div className="card" style={{ marginBottom: 14 }}>
-        <p style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-          🩺 Health Status Distribution
-        </p>
+        <p style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 2, textTransform: 'uppercase', letterSpacing: '0.06em' }}>🩺 Health Status by Life Phase</p>
+        <p style={{ fontSize: 10, color: 'var(--text-secondary)', marginBottom: 12 }}>Status across {activePhases.length} active LHRM phases</p>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
           <DonutChart segments={donutSegments} size={90} />
           <div style={{ flex: 1 }}>
             {donutSegments.map(s => (
-              <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+              <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
                 <div style={{ width: 10, height: 10, borderRadius: 2, background: s.color, flexShrink: 0 }} />
-                <span style={{ fontSize: 12, color: 'var(--text-primary)', flex: 1 }}>{s.label}</span>
-                <span style={{ fontSize: 12, fontWeight: 700, color: s.color }}>{s.value}</span>
+                <span style={{ fontSize: 12, color: 'var(--text-primary)', flex: 1 }}>{s.label} phases</span>
+                <span style={{ fontSize: 13, fontWeight: 700, color: s.color }}>{s.value}</span>
               </div>
             ))}
+            <div style={{ marginTop: 8, borderTop: '1px solid var(--border)', paddingTop: 8 }}>
+              {activePhases.map(p => (
+                <div key={p.key} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                  <span style={{ fontSize: 12 }}>{p.icon}</span>
+                  <span style={{ fontSize: 11, color: 'var(--text-primary)', flex: 1 }}>{p.label}</span>
+                  <span style={{ background: STATUS_COLOR[p.status] + '20', color: STATUS_COLOR[p.status], borderRadius: 20, padding: '1px 8px', fontSize: 9, fontWeight: 700, textTransform: 'uppercase' }}>{p.status}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Vital Trends */}
+      {/* Vital Trends — from RCH & NCD phases */}
       <div className="card" style={{ marginBottom: 14 }}>
-        <p style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-          📈 Vital Trends
-        </p>
+        <p style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 2, textTransform: 'uppercase', letterSpacing: '0.06em' }}>📈 Vital Trends</p>
+        <p style={{ fontSize: 10, color: 'var(--text-secondary)', marginBottom: 12 }}>From 🤰 RCH & 💊 NCD phase records</p>
         {[
-          { label: 'BP Systolic (mmHg)', points: bpTrend, color: '#DC2626', unit: 'mmHg', latest: 138, status: '⚠️ Pre-HTN' },
-          { label: 'Hemoglobin (g/dL)', points: hbTrend, color: '#7C3AED', unit: 'g/dL', latest: 11.5, status: '✅ Normal' },
-          { label: 'Weight (kg)', points: weightTrend, color: '#0891B2', unit: 'kg', latest: 62, status: '✅ Normal' },
-        ].map(t => (
-          <div key={t.label} style={{ marginBottom: 14, paddingBottom: 14, borderBottom: '1px solid var(--border)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+          { label: 'BP Systolic (mmHg)', points: bpTrend,     color: '#DC2626', unit: 'mmHg', latest: 138,  status: '⚠️ Pre-HTN', phase: '💊 NCD Phase' },
+          { label: 'Hemoglobin (g/dL)',  points: hbTrend,     color: '#7C3AED', unit: 'g/dL', latest: 11.5, status: '✅ Normal',  phase: '🤰 RCH Phase' },
+          { label: 'Weight (kg)',        points: weightTrend, color: '#0891B2', unit: 'kg',   latest: 62,   status: '✅ Normal',  phase: '🤰 RCH Phase' },
+        ].map((t, ti) => (
+          <div key={t.label} style={{ marginBottom: ti < 2 ? 14 : 0, paddingBottom: ti < 2 ? 14 : 0, borderBottom: ti < 2 ? '1px solid var(--border)' : 'none' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 }}>
               <div>
                 <p style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-primary)' }}>{t.label}</p>
-                <p style={{ fontSize: 11, color: 'var(--text-secondary)' }}>{t.status}</p>
+                <p style={{ fontSize: 10, color: 'var(--text-secondary)' }}>{t.phase}</p>
+                <p style={{ fontSize: 11, color: t.color, marginTop: 2 }}>{t.status}</p>
               </div>
               <div style={{ textAlign: 'right' }}>
-                <p style={{ fontSize: 18, fontWeight: 800, color: t.color }}>{t.latest}</p>
+                <p style={{ fontSize: 20, fontWeight: 800, color: t.color }}>{t.latest}</p>
                 <p style={{ fontSize: 10, color: 'var(--text-secondary)' }}>{t.unit}</p>
               </div>
             </div>
             <Sparkline points={t.points} color={t.color} width={260} height={44} />
             <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 2 }}>
-              {['Jan', 'Feb', 'Mar', 'Apr'].map(m => (
-                <span key={m} style={{ fontSize: 9, color: 'var(--text-secondary)' }}>{m}</span>
+              {['ANC-1', 'ANC-2', 'Delivery', 'Post'].map(m => (
+                <span key={m} style={{ fontSize: 8, color: 'var(--text-secondary)' }}>{m}</span>
               ))}
             </div>
           </div>
         ))}
       </div>
 
-      {/* Vaccination coverage */}
+      {/* Vaccination — Birth + Infant phases */}
       <div className="card" style={{ marginBottom: 14 }}>
-        <p style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-          💉 Vaccination Coverage
-        </p>
+        <p style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 2, textTransform: 'uppercase', letterSpacing: '0.06em' }}>💉 Vaccination Coverage</p>
+        <p style={{ fontSize: 10, color: 'var(--text-secondary)', marginBottom: 12 }}>👶 Birth & 🍼 Infant LHRM phases</p>
         <ProgressBar value={vaccDone} max={vaccTotal} color="#16A34A" label="Vaccines Given" sublabel={`${vaccDone}/${vaccTotal}`} />
         <ProgressBar value={vaccTotal - vaccDone} max={vaccTotal} color="#F59E0B" label="Vaccines Due" sublabel={`${vaccTotal - vaccDone}/${vaccTotal}`} />
         <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 8 }}>
@@ -278,55 +301,59 @@ function PatientSummary({ patient }) {
         </div>
       </div>
 
-      {/* Risk Flags */}
+      {/* Risk Flags — from NCD / RCH phases */}
       <div className="card" style={{ marginBottom: 14 }}>
-        <p style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-          🚩 Risk Flags
-        </p>
+        <p style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 2, textTransform: 'uppercase', letterSpacing: '0.06em' }}>🚩 Risk Flags by Phase</p>
+        <p style={{ fontSize: 10, color: 'var(--text-secondary)', marginBottom: 12 }}>Active alerts from LHRM phase screenings</p>
         {[
-          { label: 'Pre-Hypertension', detail: 'BP 138/88 — monitor monthly', color: '#FEF3C7', text: '#B45309', icon: '⚠️' },
-          { label: 'Anaemia (mild)', detail: 'Hb 11.2 g/dL — IFA ongoing', color: '#FFF1F2', text: '#DC2626', icon: '🩸' },
+          { label: 'Pre-Hypertension', detail: 'BP 138/88 — monitor monthly', color: '#FEF3C7', text: '#B45309', icon: '⚠️', phase: '💊 NCD' },
+          { label: 'Anaemia (mild)',   detail: 'Hb 11.2 g/dL — IFA ongoing',  color: '#FFF1F2', text: '#DC2626', icon: '🩸', phase: '🤰 RCH' },
         ].map(f => (
-          <div key={f.label} style={{ background: f.color, borderRadius: 10, padding: '10px 12px', marginBottom: 8, display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-            <span style={{ fontSize: 16 }}>{f.icon}</span>
-            <div>
-              <p style={{ fontSize: 13, fontWeight: 700, color: f.text }}>{f.label}</p>
-              <p style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>{f.detail}</p>
+          <div key={f.label} style={{ background: f.color, borderRadius: 10, padding: '10px 12px', marginBottom: 8 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 3 }}>
+              <span style={{ fontSize: 16 }}>{f.icon}</span>
+              <p style={{ fontSize: 13, fontWeight: 700, color: f.text, flex: 1 }}>{f.label}</p>
+              <span style={{ background: f.text + '20', color: f.text, borderRadius: 20, padding: '1px 7px', fontSize: 9, fontWeight: 700 }}>{f.phase}</span>
             </div>
+            <p style={{ fontSize: 11, color: 'var(--text-secondary)', marginLeft: 24 }}>{f.detail}</p>
           </div>
         ))}
-        <div style={{ background: '#F0FDF4', borderRadius: 10, padding: '10px 12px', display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+        <div style={{ background: '#F0FDF4', borderRadius: 10, padding: '10px 12px', display: 'flex', gap: 10, alignItems: 'center' }}>
           <span style={{ fontSize: 16 }}>✅</span>
           <div>
             <p style={{ fontSize: 13, fontWeight: 700, color: '#16A34A' }}>No critical alerts</p>
-            <p style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>All other parameters within normal range</p>
+            <p style={{ fontSize: 11, color: 'var(--text-secondary)' }}>All other LHRM phases within normal range</p>
           </div>
         </div>
       </div>
 
-      {/* Visit timeline */}
+      {/* LHRM Phase journey — compact timeline */}
       <div className="card" style={{ marginBottom: 14 }}>
-        <p style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-          🗓️ Visit Timeline
-        </p>
-        {[
-          { date: 'Jun 2024', event: 'Delivery — Live birth, 3.1 kg', color: '#16A34A' },
-          { date: 'Apr 2024', event: 'BP & Diabetes Screening', color: '#F59E0B' },
-          { date: 'Mar 2024', event: 'ANC Visit 2 — Hb 11.2', color: 'var(--primary)' },
-          { date: 'Feb 2024', event: 'CBAC Screening — Low Risk', color: '#7C3AED' },
-          { date: 'Jan 2024', event: 'ANC Visit 1 — Hb 10.8', color: 'var(--primary)' },
-        ].map((ev, i) => (
-          <div key={i} style={{ display: 'flex', gap: 12, marginBottom: i < 4 ? 12 : 0 }}>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <div style={{ width: 10, height: 10, borderRadius: 5, background: ev.color, flexShrink: 0, marginTop: 3 }} />
-              {i < 4 && <div style={{ width: 2, flex: 1, background: '#E5E7EB', marginTop: 3 }} />}
+        <p style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 2, textTransform: 'uppercase', letterSpacing: '0.06em' }}>🗓️ LHRM Phase Journey</p>
+        <p style={{ fontSize: 10, color: 'var(--text-secondary)', marginBottom: 12 }}>Life stages completed and upcoming</p>
+        {LHRM_PHASES.map((ph, i) => {
+          const active  = patient.age >= ph.ageStart;
+          const current = patient.age >= ph.ageStart && patient.age <= ph.ageEnd;
+          return (
+            <div key={ph.key} style={{ display: 'flex', gap: 12, marginBottom: i < LHRM_PHASES.length - 1 ? 10 : 0 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: 28 }}>
+                <div style={{ width: 28, height: 28, borderRadius: 14, background: active ? ph.color : '#E5E7EB', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, border: current ? '2px solid #DC2626' : 'none', flexShrink: 0 }}>{ph.icon}</div>
+                {i < LHRM_PHASES.length - 1 && <div style={{ width: 2, flex: 1, background: active ? ph.color + '40' : '#E5E7EB', minHeight: 12, marginTop: 2 }} />}
+              </div>
+              <div style={{ flex: 1, paddingTop: 3 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <p style={{ fontSize: 12, fontWeight: 700, color: active ? 'var(--text-primary)' : '#9CA3AF' }}>{ph.label}</p>
+                  {current && <span style={{ background: '#DC2626', color: 'white', borderRadius: 20, padding: '1px 6px', fontSize: 8, fontWeight: 700 }}>NOW</span>}
+                  {active && !current && <span style={{ background: '#DCFCE7', color: '#16A34A', borderRadius: 20, padding: '1px 6px', fontSize: 8, fontWeight: 700 }}>DONE</span>}
+                </div>
+                <div style={{ display: 'flex', gap: 6, marginTop: 2 }}>
+                  <span style={{ fontSize: 10, color: 'var(--text-secondary)' }}>{ph.ageStart}–{ph.ageEnd} yrs · {ph.events} events</span>
+                  {active && <span style={{ fontSize: 10, fontWeight: 600, color: STATUS_COLOR[ph.status] }}>● {ph.status}</span>}
+                </div>
+              </div>
             </div>
-            <div style={{ flex: 1, paddingBottom: i < 4 ? 4 : 0 }}>
-              <p style={{ fontSize: 11, color: ev.color, fontWeight: 700 }}>{ev.date}</p>
-              <p style={{ fontSize: 12, color: 'var(--text-primary)', marginTop: 1 }}>{ev.event}</p>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

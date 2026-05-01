@@ -48,15 +48,15 @@ export default function ECRegistrationScreen({ onBack }) {
           <div className="card" style={{ marginBottom: 14 }}>
             <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Woman's Details</p>
             <div className="form-group"><label className="form-label">Name of Woman <span className="required">*</span></label><input type="text" className="form-input" placeholder="Full name" value={form.nameWoman} onChange={e => set('nameWoman', e.target.value)} required /></div>
-            <div className="form-group"><label className="form-label">Samagra ID (Woman) <span className="required">*</span></label><input type="text" className="form-input" placeholder="e.g. SG-001234" value={form.samagraIdWoman} onChange={e => set('samagraIdWoman', e.target.value)} required /></div>
+            <div className="form-group"><label className="form-label">ABHA ID (Woman) <span className="required">*</span></label><input type="text" className="form-input" placeholder="e.g. SG-001234" value={form.samagraIdWoman} onChange={e => set('samagraIdWoman', e.target.value)} required /></div>
             <div className="form-group" style={{ marginBottom: 0 }}><label className="form-label">ABHA ID</label><input type="text" className="form-input" placeholder="Ayushman Bharat Health ID" value={form.abhaId} onChange={e => set('abhaId', e.target.value)} /></div>
           </div>
 
           <div className="card" style={{ marginBottom: 14 }}>
             <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Husband's Details</p>
             <div className="form-group"><label className="form-label">Name of Husband <span className="required">*</span></label><input type="text" className="form-input" placeholder="Full name" value={form.nameHusband} onChange={e => set('nameHusband', e.target.value)} required /></div>
-            <div className="form-group"><label className="form-label">Samagra ID (Husband) <span className="required">*</span></label><input type="text" className="form-input" placeholder="e.g. SG-001235" value={form.samagraIdHusband} onChange={e => set('samagraIdHusband', e.target.value)} required /></div>
-            <div className="form-group"><label className="form-label">Family Samagra ID <span className="required">*</span></label><input type="text" className="form-input" placeholder="Family identifier" value={form.familySamagraId} onChange={e => set('familySamagraId', e.target.value)} required /></div>
+            <div className="form-group"><label className="form-label">ABHA ID (Husband) <span className="required">*</span></label><input type="text" className="form-input" placeholder="e.g. SG-001235" value={form.samagraIdHusband} onChange={e => set('samagraIdHusband', e.target.value)} required /></div>
+            <div className="form-group"><label className="form-label">Family ABHA ID <span className="required">*</span></label><input type="text" className="form-input" placeholder="Family identifier" value={form.familySamagraId} onChange={e => set('familySamagraId', e.target.value)} required /></div>
             <div className="form-group" style={{ marginBottom: 0 }}><label className="form-label">Mobile Number</label><input type="tel" className="form-input" placeholder="10-digit mobile" value={form.mobile} onChange={e => set('mobile', e.target.value)} /></div>
           </div>
 

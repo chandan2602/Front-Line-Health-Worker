@@ -76,7 +76,7 @@ function PregnantWomanScreen({ onNavigate, onBack }) {
             👤 Identity Details
           </p>
 
-          <FormField label="Samagra ID">
+          <FormField label="ABHA ID">
             <input type="text" className="form-input" placeholder="e.g. SG-001234"
               value={form.samagraId} onChange={e => update('samagraId', e.target.value)} />
           </FormField>
