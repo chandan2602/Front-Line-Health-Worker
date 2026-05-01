@@ -248,6 +248,12 @@ function DrawerMenu({ isOpen, onClose, onNavigate, activeScreen }) {
         { icon: '🏥', label: 'ABDM', screen: 'abdm' },
         { icon: '📁', label: 'Electronic Medical Record', screen: 'emr' },
       ]
+    },
+    {
+      label: 'ADMINISTRATION',
+      items: [
+        { icon: '🔐', label: 'Role Management', screen: 'roles' },
+      ]
     }
   ];
 
