@@ -239,6 +239,8 @@ function DrawerMenu({ isOpen, onClose, onNavigate, activeScreen }) {
       items: [
         { icon: '🔄', label: t.menuItems.syncManager, screen: 'sync' },
         { icon: '📊', label: t.menuItems.reportsAnalytics, screen: 'reports' },
+        { icon: '🏥', label: 'ABDM', screen: 'abdm' },
+        { icon: '📁', label: 'Electronic Medical Record', screen: 'emr' },
       ]
     }
   ];
